@@ -76,9 +76,10 @@ jobs:
 
       - name: Install SonarScanner
         run: |
-          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux.zip
+          curl -sSL -o sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux.zip
           unzip sonar-scanner.zip
           mv sonar-scanner-* sonar-scanner
+          ./sonar-scanner/bin/sonar-scanner -v
           
 
       - name: Run SonarQube Analysis
