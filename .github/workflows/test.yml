@@ -74,37 +74,26 @@ jobs:
           docker ps
     
 
-#      - name: Install SonarScanner
-#        run: |
-#          curl -sSL -o sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux.zip
-#          unzip sonar-scanner.zip
-#          mv sonar-scanner-* sonar-scanner
-#          ./sonar-scanner/bin/sonar-scanner -v
+      - name: Install SonarScanner (Linux x64)
+        run: |
+          echo "⬇️ Downloading SonarScanner CLI..."
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
+          unzip sonar-scanner.zip
+          mv sonar-scanner-* sonar-scanner
+          chmod +x sonar-scanner/bin/sonar-scanner
           
 
-#      - name: Run SonarQube Analysis
-#        env:
-#          SONAR_HOST_URL: http://localhost:9000
-#          SONAR_PROJECT_KEY: demo-python
-#        run: |
-#          ./sonar-scanner/bin/sonar-scanner \
-#            -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-#            -Dsonar.sources=. \
-#            -Dsonar.host.url=$SONAR_HOST_URL \
-#            -Dsonar.language=py \
-#            -Dsonar.projectName="Demo Python Project" \
-#            -Dsonar.projectVersion=1.0 \
-#            -Dsonar.verbose=true
-
-      - name: Run SonarScanner via Docker
+      - name: Run SonarQube Analysis
+        env:
+          SONAR_HOST_URL: http://localhost:9000
+          SONAR_PROJECT_KEY: demo-python
         run: |
-          docker run --rm \
-            -v "${{ github.workspace }}:/usr/src" \
-            -e SONAR_HOST_URL="http://localhost:9000" \
-            -e SONAR_PROJECT_KEY="demo-python" \
-            sonarsource/sonar-scanner-cli \
-            -Dsonar.sources="." \
+          echo "🔍 Running SonarScanner Analysis..."
+          ./sonar-scanner/bin/sonar-scanner \
+            -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=$SONAR_HOST_URL \
+            -Dsonar.language=py \
             -Dsonar.projectName="Demo Python Project" \
             -Dsonar.projectVersion=1.0 \
-            -Dsonar.language=py \
             -Dsonar.verbose=true
