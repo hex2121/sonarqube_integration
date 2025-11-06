@@ -33,17 +33,11 @@ jobs:
         run: |
           pytest test.py -v -s --maxfail=1 --disable-warnings
 
-#      - name: Set up Docker
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install -y docker.io
-#          sudo systemctl start docker
-#          sudo systemctl enable docker
-#          docker --version
 
- # -----------------------------
-  # Job 2: Run SonarQube Code Analysis
-  # -----------------------------
+
+# -----------------------------
+# Job 2: Run SonarQube Code Analysis
+# -----------------------------
 
   sonar-analysis:
     name: Run SonarQube Code Analysis
@@ -81,7 +75,14 @@ jobs:
           unzip sonar-scanner.zip
           mv sonar-scanner-* sonar-scanner
           chmod +x sonar-scanner/bin/sonar-scanner
-          
+
+      - name: Generate SonarQube token
+        run: |
+          echo "🔑 Generating auth token for admin..."
+          # Wait to ensure web is up
+          sleep 10
+          TOKEN=$(curl -u admin:admin -X POST "http://localhost:9000/api/user_tokens/generate?name=ci-token" | jq -r '.token')
+          echo "SONAR_TOKEN=$TOKEN" >> $GITHUB_ENV
 
       - name: Run SonarQube Analysis
         env:
