@@ -16,3 +16,18 @@ def untested_function():
     x = 5
     y = 0
     return x / y
+
+
+def crash():
+    return 5 / 0
+
+
+def long_function(a, b, c, d, e, f, g, h, i, j):
+    print(a, b, c, d, e, f, g, h, i, j)
+
+
+def duplicate_1():
+    print("duplicate")
+
+def duplicate_2():
+    print("duplicate")
