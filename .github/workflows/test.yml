@@ -33,3 +33,72 @@ jobs:
         run: |
           pytest test.py -v -s --maxfail=1 --disable-warnings
 
+      - name: Set up Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
+          docker --version
+
+ # -----------------------------
+  # Job 2: Run SonarQube Code Analysis
+  # -----------------------------
+
+  sonar-analysis:
+    name: Run SonarQube Code Analysis
+    runs-on: ubuntu-latest
+
+    services:
+      sonarqube:
+        image: sonarqube:lts-community
+        ports:
+          - 9000:9000
+        options: >-
+          --health-cmd "curl -f http://localhost:9000/api/system/health || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK (required by SonarScanner)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Wait for SonarQube to start
+        run: |
+          for i in {1..30}; do
+            if curl -s http://localhost:9000/api/system/status | grep -q '"status":"UP"'; then
+              echo "SonarQube is up!"
+              break
+            fi
+            echo "Waiting for SonarQube..."
+            sleep 5
+          done
+
+      - name: Install SonarScanner
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux.zip
+          unzip sonar-scanner.zip
+          mv sonar-scanner-* sonar-scanner
+          
+
+      - name: Run SonarQube Analysis
+        env:
+          SONAR_HOST_URL: http://localhost:9000
+          SONAR_PROJECT_KEY: demo-python
+        run: |
+          ./sonar-scanner/bin/sonar-scanner \
+            -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=$SONAR_HOST_URL \
+            -Dsonar.language=py \
+            -Dsonar.projectName="Demo Python Project" \
+            -Dsonar.projectVersion=1.0 \
+            -Dsonar.verbose=true
