@@ -27,7 +27,7 @@ jobs:
 
       - name: Run Unit Tests with Coverage
         run: |
-          python -m pytest -v -s --maxfail=1 --disable-warnings --cov=. --cov-report=xml:test-coverage.xml
+          python -m pytest test.py -s -v --maxfail=1 --disable-warnings --cov=. --cov-report=xml:test-coverage.xml
 
       - name: Upload coverage for next job
         uses: actions/upload-artifact@v4
