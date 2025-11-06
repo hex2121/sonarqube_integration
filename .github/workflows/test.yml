@@ -33,3 +33,68 @@ jobs:
         run: |
           pytest test.py -v -s --maxfail=1 --disable-warnings
 
+
+
+# -----------------------------
+# Job 2: Run SonarQube Code Analysis
+# -----------------------------
+
+  sonar-analysis:
+    name: Run SonarQube Code Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK (required by SonarScanner)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Start SonarQube in background
+        run: |
+          docker run -d --name sonarqube -p 9000:9000 sonarqube:lts-community
+          echo "⏳ Waiting for SonarQube to be ready..."
+          for i in {1..30}; do
+            if curl -s http://localhost:9000/api/system/status | grep -q '"status":"UP"'; then
+              echo "SonarQube is up!"
+              break
+            fi
+            echo "Waiting... ($i)"
+            sleep 5
+          done
+          docker ps
+    
+
+      - name: Install SonarScanner (Linux x64)
+        run: |
+          echo "⬇️ Downloading SonarScanner CLI..."
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
+          unzip sonar-scanner.zip
+          mv sonar-scanner-* sonar-scanner
+          chmod +x sonar-scanner/bin/sonar-scanner
+
+      - name: Generate SonarQube token
+        run: |
+          echo "🔑 Generating auth token for admin..."
+          # Wait to ensure web is up
+          sleep 10
+          TOKEN=$(curl -u admin:admin -X POST "http://localhost:9000/api/user_tokens/generate?name=ci-token" | jq -r '.token')
+          echo "SONAR_TOKEN=$TOKEN" >> $GITHUB_ENV
+
+      - name: Run SonarQube Analysis
+        env:
+          SONAR_HOST_URL: http://localhost:9000
+          SONAR_PROJECT_KEY: demo-python
+        run: |
+          echo "🔍 Running SonarScanner Analysis..."
+          ./sonar-scanner/bin/sonar-scanner \
+            -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=$SONAR_HOST_URL \
+            -Dsonar.language=py \
+            -Dsonar.projectName="Demo Python Project" \
+            -Dsonar.projectVersion=1.0 \
+            -Dsonar.verbose=true
