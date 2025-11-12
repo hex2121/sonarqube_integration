@@ -21,6 +21,8 @@ def untested_function():
 def crash():
     return 5 / 0
 
+crash()
+
 
 def long_function(a, b, c, d, e, f, g, h, i, j):
     print(a, b, c, d, e, f, g, h, i, j)
