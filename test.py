@@ -12,6 +12,8 @@ def test_sum_of_3():
     sum_of_2 = 1+1
     assert sum_of_2 == 2, f"Failed got {sum_of_2}"
 
+
+
 def untested_function():
     x = 5
     y = 0
