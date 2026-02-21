@@ -37,8 +37,9 @@ jobs:
 
       - name: Convert gtest → allure
         run: |
-          pip3 install allure-gtest
+          sudo install allure 
           allure-gtest results.xml -o allure-results
+          allure generate junit-results.xml -o allure-results --clean
 
       - name: Upload Allure Results
         uses: actions/upload-artifact@v4
