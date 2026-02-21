@@ -37,10 +37,12 @@ jobs:
 
       - name: Install Allure
         run: |
-          wget https://github.com/allure-framework/allure2/releases/latest/download/allure-2.25.0.zip
-          unzip allure-2.25.0.zip
-          sudo mv allure-2.25.0 /opt/allure
-          sudo ln -s /opt/allure/bin/allure /usr/local/bin/allure
+          LATEST=$(curl -s https://api.github.com/repos/allure-framework/allure2/releases/latest | grep tag_name | cut -d '"' -f4)
+          
+          wget https://github.com/allure-framework/allure2/releases/download/$LATEST/allure-$LATEST.zip
+          unzip allure-$LATEST.zip
+          sudo mv allure-$LATEST /opt/allure
+          sudo ln -sf /opt/allure/bin/allure /usr/local/bin/allure
 
       - name: Convert JUnit → Allure
         run: |
