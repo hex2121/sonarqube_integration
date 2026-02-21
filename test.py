@@ -21,12 +21,12 @@ def untested_function():
     return x / y
 
 
-def crash():
-    return 5 / 0
+# def crash():
+#     return 5 / 0
 
 
 
-crash()
+# crash()
 
 
 
