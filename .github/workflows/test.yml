@@ -46,7 +46,7 @@ jobs:
 
       - name: Convert JUnit → Allure
         run: |
-          allure generate junit-results.xml -o allure-results --clean
+          allure generate results.xml -o allure-results --clean
 
       - name: Upload results
         uses: actions/upload-artifact@v4
