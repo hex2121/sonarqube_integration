@@ -35,13 +35,18 @@ jobs:
           name: test_results
           path: results.xml
 
-      - name: Convert gtest → allure
+      - name: Install Allure
         run: |
-          sudo install allure 
-          allure-gtest results.xml -o allure-results
+          wget https://github.com/allure-framework/allure2/releases/latest/download/allure-2.25.0.zip
+          unzip allure-2.25.0.zip
+          sudo mv allure-2.25.0 /opt/allure
+          sudo ln -s /opt/allure/bin/allure /usr/local/bin/allure
+
+      - name: Convert JUnit → Allure
+        run: |
           allure generate junit-results.xml -o allure-results --clean
 
-      - name: Upload Allure Results
+      - name: Upload results
         uses: actions/upload-artifact@v4
         with:
           name: allure-results
